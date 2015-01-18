@@ -141,22 +141,61 @@ row.names(activity_replace_na) <- NULL
 
 ### Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
-This histogram shows the frequency of the new processed data.
+This histogram shows the frequency of the new processed data. In the new data, the missing values are replaced with the average value for that interval.
 ```{r}
-daily_total_steps <- tapply(activity_replace_na$steps,activity_replace_na$date, sum)
+daily_total_steps_replace_na <- tapply(activity_replace_na$steps,activity_replace_na$date, sum)
 library(ggplot2)
-max_steps_in_day <- max(daily_total_steps)
-qplot(daily_total_steps, 
+max_steps_in_day <- max(daily_total_steps_replace_na)
+qplot(daily_total_steps_replace_na, 
       geom = "histogram", 
       binwidth = max_steps_in_day/32,
       xlab = "Daily Step Total",
       ylab = "Count",
-      main = "Frequency of Daily Step Totals with NAs Replaced")
+      main = "Frequency of Daily Step Totals with Missing Values Replaced")
 ```
 
-#### Do these values differ from the estimates from the first part of the assignment?
+The mean total number of steps per day is 
+```{r}
+mean_daily_total_steps_replace_na <- mean(daily_total_steps_replace_na)
+mean_daily_total_steps_replace_na
+```
 
-#### What is the impact of imputing missing data on the estimates of the total daily number of steps?
+The median total number of steps per day is 
+```{r}
+median_daily_total_steps_replace_na <- median(daily_total_steps_replace_na)
+median_daily_total_steps_replace_na
+```
+
+The original mean daily step total is 
+```{r}
+mean_daily_total_steps
+```
+The new mean daily step total is 
+```{r}
+mean_daily_total_steps_replace_na
+```
+
+The original median daily step total is 
+```{r}
+median_daily_total_steps
+```
+The new median daily step total is 
+```{r}
+median_daily_total_steps_replace_na
+```
+
+
+
+#### Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+The estimates calculated from the dataset with replaced missing values are lower than the estimates that excluded missing values. The new histogram shows how replacing the missing values created more days with very few steps.
+
+There is a small reduction in the median steps per day, because the number of days with few steps is low compared to the total number of days. The new values have a greater affect on the mean steps per day, because they at the lower extreme of the previous dataset.
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Using the data with replaced missing values:
+```{r}
+
+```
 
