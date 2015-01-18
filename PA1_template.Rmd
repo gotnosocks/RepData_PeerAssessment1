@@ -84,13 +84,13 @@ num_of_days <- length(as.factor(activity_proc$date))
 avg_steps_in_interval <- total_steps_in_interval/num_of_days
 
 ## Convert to a factor to extract all the unique values
-interval_levels <- attr(as.factor(activity_proc$interval),"levels")
+interval_level <- attr(as.factor(activity_proc$interval),"levels")
 ## Convert to numeric so the plot is sorted correctly
-interval_levels <- as.numeric(interval_levels)
+interval_level <- as.numeric(interval_level)
 
-interval_avg_steps <- data.frame(interval_levels, avg_steps_in_interval)
+interval_avg_steps <- data.frame(interval_level, avg_steps_in_interval)
 
-qplot(interval_levels, 
+qplot(interval_level, 
       avg_steps_in_interval, 
       interval_avg_steps,
       geom = "line",
@@ -104,17 +104,59 @@ qplot(interval_levels,
 
 ```{r}
 index_max <- which.max(x = interval_avg_steps$avg_steps_in_interval)
-interval_avg_steps$interval_levels[index_max]
+interval_avg_steps$interval_level[index_max]
 ```
 
 ## Imputing missing values
 ### Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
-
+The number of missing values is the dataset is shown below.
 ```{r}
 num_missing_values <- nrow(activity_raw[is.na(activity_raw),])
 num_missing_values
 ```
 
+### Devise a strategy for filling in all of the missing values in the dataset.
 
+I used the strategy of replacing the missing values with the average value for 
+that interval.
+
+### Create a new dataset that is equal to the original dataset but with the missing data filled in.
+```{r}
+# Add a column with interval averages to the raw data
+activity_raw_plus_avgs <- merge(x = activity_raw,
+                                y = interval_avg_steps, 
+                                by.x = "interval",
+                                by.y = "interval_level")
+
+# Put the rows back in the original order
+index <- with(activity_raw_plus_avgs, order(date, interval))
+activity_raw_plus_avgs <- activity_raw_plus_avgs[index,]
+
+
+activity_raw_plus_avgs$steps <- ifelse(is.na(activity_raw_plus_avgs$steps),activity_raw_plus_avgs$avg_steps_in_interval,activity_raw_plus_avgs$steps)
+
+activity_replace_na <- activity_raw_plus_avgs[,c(2,3,1)]
+row.names(activity_replace_na) <- NULL
+```
+
+### Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
+
+This histogram shows the frequency of the new processed data.
+```{r}
+daily_total_steps <- tapply(activity_replace_na$steps,activity_replace_na$date, sum)
+library(ggplot2)
+max_steps_in_day <- max(daily_total_steps)
+qplot(daily_total_steps, 
+      geom = "histogram", 
+      binwidth = max_steps_in_day/32,
+      xlab = "Daily Step Total",
+      ylab = "Count",
+      main = "Frequency of Daily Step Totals with NAs Replaced")
+```
+
+#### Do these values differ from the estimates from the first part of the assignment?
+
+#### What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
