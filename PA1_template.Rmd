@@ -194,15 +194,48 @@ There is a small reduction in the median steps per day, because the number of da
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-### Process data to separate weekdays and weekends
+### Process data to separate weekdays and weekends. Create a new factor in the dataset with two levels, weekday and weekend.
 Using the data with replaced missing values:
 ```{r}
 day_name <- weekdays(as.Date(activity_replace_na$date))
 
 activity_replace_na$day <- day_name
 
-weekend <- activity_replace_na[activity_replace_na$day %in% c("Saturday","Sunday"),]
-weekday <- activity_replace_na[!activity_replace_na$day %in% c("Saturday","Sunday"),]
+activity_replace_na$day <- as.factor(ifelse(activity_replace_na$day %in% c("Saturday","Sunday"),"weekend","weekday"))
 
 ```
+
+### Plot the data faceted by weekend/weekday.
+```{r}
+is_weekday <- activity_replace_na$day == "weekday"
+weekday_interval_total_steps <- tapply(activity_replace_na[is_weekday,]$steps,activity_replace_na[is_weekday,]$interval, sum)
+weekend_interval_total_steps <- tapply(activity_replace_na[!is_weekday,]$steps,activity_replace_na[!is_weekday,]$interval, sum)
+
+weekday_num_days <- length(as.factor(weekday$date))
+weekend_num_days <- length(as.factor(weekend$date))
+
+weekday_interval_avg_steps <- weekday_interval_total_steps/weekday_num_days
+weekend_interval_avg_steps <- weekend_interval_total_steps/weekend_num_days
+
+weekday_interval_avg_steps <- data.frame(interval_level, weekday_interval_avg_steps)
+weekend_interval_avg_steps <- data.frame(interval_level, weekend_interval_avg_steps)
+
+weekday_interval_avg_steps$weekday <- "weekday"
+weekend_interval_avg_steps$weekday <- "weekend"
+
+colnames(weekday_interval_avg_steps) <- c("interval", "avg_steps", "weekday")
+colnames(weekend_interval_avg_steps) <- c("interval", "avg_steps", "weekday")
+
+interval_avg_steps <- rbind(weekday_interval_avg_steps,weekend_interval_avg_steps)
+avg_step_plot <- qplot(x = interval, 
+      y = avg_steps, 
+      data = interval_avg_steps,
+      geom = "line",
+      xlab = "Interval", 
+      ylab = "Number of Steps",
+      main = "Average Number of Steps in Each Interval")
+
+avg_step_plot + facet_grid(weekday ~.)
+```
+
 
