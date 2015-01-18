@@ -194,6 +194,8 @@ There is a small reduction in the median steps per day, because the number of da
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+There is a difference in activity patterns between weekdays and weekends. On weekdays, activity starts earlier and spikes early in the day. On weekends the activity starts later in the day and is more consistent thoughout the day.
+
 ### Process data to separate weekdays and weekends. Create a new factor in the dataset with two levels, weekday and weekend.
 Using the data with replaced missing values:
 ```{r}
@@ -211,8 +213,8 @@ is_weekday <- activity_replace_na$day == "weekday"
 weekday_interval_total_steps <- tapply(activity_replace_na[is_weekday,]$steps,activity_replace_na[is_weekday,]$interval, sum)
 weekend_interval_total_steps <- tapply(activity_replace_na[!is_weekday,]$steps,activity_replace_na[!is_weekday,]$interval, sum)
 
-weekday_num_days <- length(as.factor(weekday$date))
-weekend_num_days <- length(as.factor(weekend$date))
+weekday_num_days <- length(as.factor(activity_replace_na[is_weekday,]$date))
+weekend_num_days <- length(as.factor(activity_replace_na[!is_weekday,]$date))
 
 weekday_interval_avg_steps <- weekday_interval_total_steps/weekday_num_days
 weekend_interval_avg_steps <- weekend_interval_total_steps/weekend_num_days
