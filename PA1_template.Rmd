@@ -194,8 +194,15 @@ There is a small reduction in the median steps per day, because the number of da
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+### Process data to separate weekdays and weekends
 Using the data with replaced missing values:
 ```{r}
+day_name <- weekdays(as.Date(activity_replace_na$date))
+
+activity_replace_na$day <- day_name
+
+weekend <- activity_replace_na[activity_replace_na$day %in% c("Saturday","Sunday"),]
+weekday <- activity_replace_na[!activity_replace_na$day %in% c("Saturday","Sunday"),]
 
 ```
 
